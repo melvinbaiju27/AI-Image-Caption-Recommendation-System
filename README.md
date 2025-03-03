@@ -79,3 +79,4 @@ The application uses a pre-trained Vision Transformer (ViT) and GPT-2 model from
 
 ## Website Demo
 ![Image](https://github.com/user-attachments/assets/e590ff6a-efb1-4b54-aed9-91bf086b6657)
+![Image](https://github.com/user-attachments/assets/68b80288-93f4-4bca-8342-fd94e9790bff)
