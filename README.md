@@ -78,3 +78,4 @@ The application uses a pre-trained Vision Transformer (ViT) and GPT-2 model from
 - Advanced image editing features
 
 ## Website Demo
+![Image](https://github.com/user-attachments/assets/e590ff6a-efb1-4b54-aed9-91bf086b6657)
