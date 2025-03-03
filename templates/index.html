@@ -1,0 +1,385 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Caption Recommendation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            border-radius: 0 0 20px 20px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            border: none;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a0cb6 0%, #1464e5 100%);
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+        .image-container {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .caption-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2575fc;
+            transition: all 0.3s ease;
+        }
+        .caption-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        .caption-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #0d6efd;
+        }
+        #results {
+            display: none;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        .feature-box {
+            text-align: center;
+            padding: 30px 15px;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #6a11cb;
+        }
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <div class="container">
+            <h1><i class="fas fa-camera-retro"></i> AI Image Caption Recommendation System</h1>
+            <p class="lead">Upload an image or provide a URL to generate AI-powered captions</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h4>Upload Images</h4>
+                    <p>Upload your photos or provide image URLs for captioning</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h4>AI Analysis</h4>
+                    <p>Our advanced AI model analyzes your images for accurate captions</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h4>Smart Recommendations</h4>
+                    <p>Get multiple caption suggestions tailored to your image</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="true">Upload Image</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url" type="button" role="tab" aria-controls="url" aria-selected="false">Image URL</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+                                <form id="upload-form" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="file" class="form-label">Choose an image to upload</label>
+                                        <input class="form-control" type="file" id="file" name="file" accept="image/*">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="num_recommendations" class="form-label">Number of recommendations</label>
+                                        <input type="range" class="form-range" min="1" max="5" value="3" id="num_recommendations" name="num_recommendations">
+                                        <div class="text-center" id="num_recommendations_value">3</div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Generate Captions</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="tab-pane fade" id="url" role="tabpanel" aria-labelledby="url-tab">
+                                <form id="url-form">
+                                    <div class="mb-3">
+                                        <label for="image_url" class="form-label">Enter image URL</label>
+                                        <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="num_recommendations_url" class="form-label">Number of recommendations</label>
+                                        <input type="range" class="form-range" min="1" max="5" value="3" id="num_recommendations_url" name="num_recommendations">
+                                        <div class="text-center" id="num_recommendations_url_value">3</div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Generate Captions</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Analyzing your image and generating captions...</p>
+        </div>
+
+        <div id="results" class="row mt-4">
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Uploaded Image</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="image-container">
+                            <img id="image-preview" class="image-preview" src="" alt="Uploaded image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Generated Captions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6>AI Generated Caption:</h6>
+                            <div id="main-caption" class="caption-item selected">
+                                <i class="fas fa-quote-left me-2 text-primary"></i>
+                                <span id="caption-text"></span>
+                                <i class="fas fa-quote-right ms-2 text-primary"></i>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6>Alternative Suggestions:</h6>
+                            <div id="recommendations-container"></div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button id="copy-button" class="btn btn-primary">
+                                <i class="fas fa-copy me-2"></i> Copy Selected Caption
+                            </button>
+                            <button id="save-button" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-save me-2"></i> Save Caption
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center">
+        <div class="container">
+            <p>AI Image Caption Recommendation System &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update range slider value display
+            document.getElementById('num_recommendations').addEventListener('input', function() {
+                document.getElementById('num_recommendations_value').textContent = this.value;
+            });
+            
+            document.getElementById('num_recommendations_url').addEventListener('input', function() {
+                document.getElementById('num_recommendations_url_value').textContent = this.value;
+            });
+            
+            // Handle file upload form submission
+            document.getElementById('upload-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                processForm(formData);
+            });
+            
+            // Handle URL form submission
+            document.getElementById('url-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                processForm(formData);
+            });
+            
+            // Copy button functionality
+            document.getElementById('copy-button').addEventListener('click', function() {
+                const selectedCaption = document.querySelector('.caption-item.selected');
+                if (selectedCaption) {
+                    const captionText = selectedCaption.textContent.trim();
+                    navigator.clipboard.writeText(captionText)
+                        .then(() => {
+                            this.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
+                            setTimeout(() => {
+                                this.innerHTML = '<i class="fas fa-copy me-2"></i> Copy Selected Caption';
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                }
+            });
+            
+            // Save button functionality (simulated)
+            document.getElementById('save-button').addEventListener('click', function() {
+                const selectedCaption = document.querySelector('.caption-item.selected');
+                if (selectedCaption) {
+                    this.innerHTML = '<i class="fas fa-check me-2"></i> Saved!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-save me-2"></i> Save Caption';
+                    }, 2000);
+                }
+            });
+            
+            // Function to process form data
+            function processForm(formData) {
+                // Show loading spinner
+                document.getElementById('loading').style.display = 'flex';
+                document.getElementById('results').style.display = 'none';
+                
+                // Send request to server
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Display results
+                        document.getElementById('image-preview').src = data.image_path;
+                        document.getElementById('caption-text').textContent = data.caption;
+                        
+                        // Display recommendations
+                        const recommendationsContainer = document.getElementById('recommendations-container');
+                        recommendationsContainer.innerHTML = '';
+                        
+                        data.recommendations.forEach((rec, index) => {
+                            const recDiv = document.createElement('div');
+                            recDiv.className = 'caption-item';
+                            recDiv.innerHTML = `
+                                <i class="fas fa-quote-left me-2 text-secondary"></i>
+                                ${rec}
+                                <i class="fas fa-quote-right ms-2 text-secondary"></i>
+                            `;
+                            
+                            // Make recommendations selectable
+                            recDiv.addEventListener('click', function() {
+                                document.querySelectorAll('.caption-item').forEach(item => {
+                                    item.classList.remove('selected');
+                                });
+                                this.classList.add('selected');
+                            });
+                            
+                            recommendationsContainer.appendChild(recDiv);
+                        });
+                        
+                        // Hide loading, show results
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('results').style.display = 'flex';
+                    } else {
+                        alert('Error: ' + data.error);
+                        document.getElementById('loading').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request.');
+                    document.getElementById('loading').style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
